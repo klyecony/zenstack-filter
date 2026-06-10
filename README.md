@@ -46,7 +46,7 @@ npm install zenstack-filter
 Peer dependencies (install the ones you use):
 
 ```bash
-npm install @zenstackhq/orm @zenstackhq/schema zod
+npm install @zenstackhq/orm @zenstackhq/schema
 # only if you use the React hooks:
 npm install react
 ```
@@ -55,7 +55,6 @@ npm install react
 | --- | --- | --- |
 | `@zenstackhq/orm` | `^3` | types |
 | `@zenstackhq/schema` | `^3` | schema helpers |
-| `zod` | `>=3` | validation |
 | `react` | `>=18` | hook entry points only (optional) |
 
 ## Concepts
@@ -221,29 +220,9 @@ search-first async source (`useSearch` / `useResolve`) — `zenstack-filter/infi
 provides `createInfiniteSearch` to wire infinite scroll onto an
 `useInfiniteQuery`-style hook.
 
-## Validation
-
-Validation is **caller-side and opt-in**. The hooks do **not** validate a value
-before persisting it — `applyFilter` writes whatever you hand it (it only skips
-filters flagged `disabled`). Validate in your editor UI before calling
-`applyFilter`, using the helpers from `zenstack-filter/validate`:
-
-```ts
-import { validateValue, isValueComplete } from "zenstack-filter/validate";
-
-const result = validateValue(def.type, value);
-if (result.ok) {
-  await control.applyFilter({ ...activeFilter, value: result.value });
-} else {
-  showError(result.error); // e.g. "invalid date", "gte must be <= lte"
-}
-```
-
-| Helper | Returns |
-| --- | --- |
-| `validateValue(type, value)` | `{ ok: true; value } \| { ok: false; error }` (coerces, e.g. numeric strings → number) |
-| `isValueComplete(type, value)` | `boolean` — quick "is this filled in enough to apply?" check |
-| `validateActiveFilter(filter, type)` | validates a whole `ActiveFilter`, returning the coerced filter |
+> The hooks persist values **as-is** — `applyFilter` writes whatever you hand it
+> (it only skips filters flagged `disabled`). Validate in your editor UI before
+> calling `applyFilter`.
 
 ## Required schema
 
@@ -379,7 +358,7 @@ consumers never pull in `react`.
 | `zenstack-filter/operators` | filter operators + helpers |
 | `zenstack-filter/schema` | schema helpers |
 | `zenstack-filter/generate` | `FilterDef` generation |
-| `zenstack-filter/registry`, `/validate`, `/dates` | building blocks |
+| `zenstack-filter/registry`, `/dates` | building blocks |
 | `zenstack-filter/useFilter` | React: filter state + persistence |
 | `zenstack-filter/useFilterViews` | React: saved filter views |
 | `zenstack-filter/useFilterOptions` | React: async option loading |

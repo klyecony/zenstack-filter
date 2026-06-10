@@ -60,10 +60,6 @@
       "types": "./dist/generate.d.ts",
       "import": "./dist/generate.js"
     },
-    "./validate": {
-      "types": "./dist/validate.d.ts",
-      "import": "./dist/validate.js"
-    },
     "./useFilter": {
       "types": "./dist/useFilter.d.ts",
       "import": "./dist/useFilter.js"
@@ -101,8 +97,7 @@
     "@zenstackhq/orm": "^3",
     "@zenstackhq/schema": "^3",
     "@zenstackhq/sdk": "^3",
-    "react": ">=18",
-    "zod": ">=3"
+    "react": ">=18"
   },
   "peerDependenciesMeta": {
     "@zenstackhq/language": {
@@ -123,8 +118,7 @@
     "@zenstackhq/schema": "^3",
     "@zenstackhq/sdk": "^3",
     "tsup": "^8.5.0",
-    "typescript": "^5.9.0",
-    "zod": "^4"
+    "typescript": "^5.9.0"
   },
   "publishConfig": {
     "access": "public"

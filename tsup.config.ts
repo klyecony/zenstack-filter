@@ -9,7 +9,6 @@ export default defineConfig({
     build: "src/build.ts",
     schema: "src/schema.ts",
     generate: "src/generate.ts",
-    validate: "src/validate.ts",
     useFilter: "src/useFilter.ts",
     useFilterViews: "src/useFilterViews.ts",
     useFilterOptions: "src/useFilterOptions.ts",
@@ -28,7 +27,6 @@ export default defineConfig({
   // Peers — never bundle these into the output.
   external: [
     "react",
-    "zod",
     "@zenstackhq/orm",
     "@zenstackhq/schema",
     "@zenstackhq/sdk",
