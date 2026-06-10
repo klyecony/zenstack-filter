@@ -40,8 +40,7 @@ Persistence (the `useFilter` / `useFilterViews` hooks) reads and writes two
 models in **your** ZenStack schema: `Filter` and `FilterView`. The package owns
 a fixed set of columns — `id`, `filterSet`, `identifier`, `operator`, `value`,
 `viewId`, `createdAt`, `updatedAt` on `Filter`, and `id`, `name`, `filterSet`,
-`createdAt`, `updatedAt` on `FilterView`. Everything else you add (e.g.
-`userId`, `organizationId`) becomes the typed **scope** passed to `useFilter`.
+`createdAt`, `updatedAt` on `FilterView`.
 
 > You can scaffold these models with the bundled plugin instead of writing them
 > by hand — see [Generating the models](#generating-the-models). If you only use
@@ -166,6 +165,7 @@ consumers never pull in `react`.
 | `zenstack-filter/useFilterViews` | React: saved filter views |
 | `zenstack-filter/useFilterOptions` | React: async option loading |
 | `zenstack-filter/infiniteSource` | React: infinite option source |
+| `zenstack-filter/plugin` | ZenStack plugin: scaffold the persistence models |
 
 ## License
 
