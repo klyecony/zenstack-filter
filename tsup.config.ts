@@ -17,6 +17,7 @@ export default defineConfig({
     useFilterOptions: "src/useFilterOptions.ts",
     dates: "src/dates.ts",
     infiniteSource: "src/infiniteSource.ts",
+    plugin: "src/plugin.ts",
   },
   format: ["esm"],
   dts: true,
@@ -27,7 +28,14 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   // Peers — never bundle these into the output.
-  external: ["react", "zod", "@zenstackhq/orm", "@zenstackhq/schema"],
+  external: [
+    "react",
+    "zod",
+    "@zenstackhq/orm",
+    "@zenstackhq/schema",
+    "@zenstackhq/sdk",
+    "@zenstackhq/language",
+  ],
   // esbuild drops module-level directives when bundling; we re-add "use client"
   // to the React entries in onSuccess, so silence the warning here.
   esbuildOptions(options) {

@@ -34,6 +34,89 @@ npm install react
 | `zod` | `>=3` | validation |
 | `react` | `>=18` | hook entry points only (optional) |
 
+## Required schema
+
+Persistence (the `useFilter` / `useFilterViews` hooks) reads and writes two
+models in **your** ZenStack schema: `Filter` and `FilterView`. The package owns
+a fixed set of columns — `id`, `filterSet`, `identifier`, `operator`, `value`,
+`viewId`, `createdAt`, `updatedAt` on `Filter`, and `id`, `name`, `filterSet`,
+`createdAt`, `updatedAt` on `FilterView`. Everything else you add (e.g.
+`userId`, `organizationId`) becomes the typed **scope** passed to `useFilter`.
+
+> You can scaffold these models with the bundled plugin instead of writing them
+> by hand — see [Generating the models](#generating-the-models). If you only use
+> the headless core (`buildWhere`, `createFilterSystem`) without the persistence
+> hooks, you don't need these models at all.
+
+```zmodel
+model Filter {
+  id         String      @id @default(cuid())
+
+  filterSet  String
+  identifier String
+  operator   String
+  value      Json
+  viewId     String?
+  view       FilterView? @relation(fields: [viewId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+}
+
+model FilterView {
+  id        String   @id @default(cuid())
+
+  name      String
+  filterSet String
+  filters   Filter[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+### Generating the models
+
+Instead of writing the models by hand, register the bundled plugin in your
+`schema.zmodel`. On the next `zen generate` it scaffolds the two models into a
+ZModel file you then import:
+
+```zmodel
+plugin filter {
+  provider    = 'zenstack-filter/plugin'
+  output      = './generated/filter.zmodel'   // relative to the schema; default: filter.zmodel
+  filterModel = 'Filter'                       // optional, default: Filter
+  viewModel   = 'FilterView'                   // optional, default: FilterView
+}
+```
+
+```bash
+npx zen generate
+```
+
+Then import the generated file once:
+
+```zmodel
+import './generated/filter'
+```
+
+The file is written **only once** — regeneration is skipped as soon as the
+models exist in your schema (whether scaffolded or hand-written). So after the
+first run the file is yours: add scope fields, tighten the `@@allow` policy, add
+relations, and re-run `zen generate` freely without losing changes. The scaffold
+ships with `@@allow('all', true)` and a `TODO` — restrict it before going to
+production.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `output` | `filter.zmodel` | Target file, relative to the schema directory |
+| `filterModel` | `Filter` | Name of the generated filter model |
+| `viewModel` | `FilterView` | Name of the generated filter-view model |
+
+> The plugin needs `@zenstackhq/sdk` and `@zenstackhq/language` — both come with
+> a ZenStack 3 install. If you rename `filterModel`, also point the package's
+> `FilterModelName` type at the new name via declaration merging so the typed
+> `scope` keeps working.
+
 ## Quick start
 
 ```ts
