@@ -112,9 +112,9 @@ production.
 | `viewModel` | `FilterView` | Name of the generated filter-view model |
 
 > The plugin needs `@zenstackhq/sdk` and `@zenstackhq/language` — both come with
-> a ZenStack 3 install. If you rename `filterModel`, also point the package's
-> `FilterModelName` type at the new name via declaration merging so the typed
-> `scope` keeps working.
+> a ZenStack 3 install. If you rename `filterModel`, pass the same name to
+> `createFilterSystem({ schema, filterModel: 'SavedFilter' })` — it flows through
+> `FilterSet` into the hooks so the typed `scope` stays bound to the right model.
 
 ## Quick start
 

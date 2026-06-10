@@ -12,9 +12,14 @@ export type AnySchema = SchemaDef;
 export type ModelName<TSchema extends AnySchema> = Extract<keyof TSchema["models"], string>;
 
 /**
- * Hardcoded name of the persistence model. Consumers must add a `Filter` model
- * to their ZenStack schema with the reserved fields (id, table, identifier,
- * operator, value, createdAt, updatedAt) plus any extra scope columns.
+ * Default name of the persistence model. Consumers add a model with this name
+ * (the reserved fields — id, filterSet, viewId, identifier, operator, value,
+ * createdAt, updatedAt — plus any scope columns) to their ZenStack schema.
+ *
+ * To use a different name, pass `filterModel` to `createFilterSystem` — the
+ * name then flows through `FilterSet` into `useFilter`/`useFilterViews` so
+ * `scope` stays typed against the right model. This `FilterModelName` is only
+ * the fallback when no override is given.
  */
 export type FilterModelName = "Filter";
 
@@ -41,13 +46,16 @@ export type ReservedFilterFields =
   | "updatedAt";
 
 /**
- * Strongly-typed scope for `useFilter` — derived from the user's `Filter`
- * model. Includes every column except the reserved ones (id, table, …).
+ * Strongly-typed scope for `useFilter` — derived from the persistence model
+ * (`Filter` by default, or whatever `createFilterSystem({ filterModel })` was
+ * given). Includes every column except the reserved ones (id, filterSet, …).
  */
-export type FilterScope<TSchema extends AnySchema> =
-  FilterModelName extends ModelName<TSchema>
-    ? Omit<ModelResult<TSchema, FilterModelName>, ReservedFilterFields>
-    : never;
+export type FilterScope<
+  TSchema extends AnySchema,
+  TFilterModel extends ModelName<TSchema> = FilterModelName & ModelName<TSchema>,
+> = [TFilterModel] extends [never]
+  ? never
+  : Omit<ModelResult<TSchema, TFilterModel>, ReservedFilterFields>;
 
 export type FieldName<
   TSchema extends AnySchema,
@@ -409,10 +417,16 @@ export interface FilterSystemInternals {
  * top-level filter functions to look up the registered config and produce
  * typed FilterDefs without going through a system object.
  */
-export interface FilterSet<TSchema extends AnySchema, M extends ModelName<TSchema>> {
+export interface FilterSet<
+  TSchema extends AnySchema,
+  M extends ModelName<TSchema>,
+  TFilterModel extends ModelName<TSchema> = FilterModelName & ModelName<TSchema>,
+> {
   readonly __filterSet: true;
   readonly table: M;
   readonly name: string;
   readonly _schema?: TSchema;
+  /** Phantom: carries the persistence model name so `useFilter` can type `scope`. */
+  readonly _filterModel?: TFilterModel;
   readonly __system: FilterSystemInternals;
 }

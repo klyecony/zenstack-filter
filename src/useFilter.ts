@@ -6,6 +6,7 @@ import type {
   ActiveFilter,
   AnySchema,
   FilterDef,
+  FilterModelName,
   FilterPersistenceClient,
   FilterScope,
   FilterSet,
@@ -15,15 +16,18 @@ import type {
   WhereInput,
 } from "./types.ts";
 
-export interface UseFilterOptions<TSchema extends AnySchema> {
+export interface UseFilterOptions<
+  TSchema extends AnySchema,
+  TFilterModel extends ModelName<TSchema> = FilterModelName & ModelName<TSchema>,
+> {
   /** Required ZenStack persistence client for the Filter model. Reference must be stable. */
   client: FilterPersistenceClient;
 
   /** Gates DB persistence. When false: queries are disabled, mutations no-op. Default: true. */
   enabled?: boolean;
 
-  /** Strongly-typed scope for the persisted Filter records — derived from the user's `Filter` model. */
-  scope?: FilterScope<TSchema>;
+  /** Strongly-typed scope for the persisted Filter records — derived from the persistence model. */
+  scope?: FilterScope<TSchema, TFilterModel>;
 
   /**
    * Which filter bucket this hook reads/writes. `null` (default) is the editable
@@ -41,9 +45,13 @@ export interface UseFilterOptions<TSchema extends AnySchema> {
  * `filterFactory`) and an options object. Reads the system internals from
  * the set, so no filter-system reference is passed.
  */
-export function useFilter<TSchema extends AnySchema, M extends ModelName<TSchema>>(
-  set: FilterSet<TSchema, M>,
-  opts: UseFilterOptions<TSchema>,
+export function useFilter<
+  TSchema extends AnySchema,
+  M extends ModelName<TSchema>,
+  TFilterModel extends ModelName<TSchema> = FilterModelName & ModelName<TSchema>,
+>(
+  set: FilterSet<TSchema, M, TFilterModel>,
+  opts: UseFilterOptions<TSchema, TFilterModel>,
 ): UseFilterReturn {
   const { helpers, generator, hasSet } = set.__system;
   const { generateFilterDefsForSet, findFilterDefForSet } = generator;

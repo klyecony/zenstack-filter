@@ -3,6 +3,7 @@
 import { useCallback, useMemo } from "react";
 import type {
   AnySchema,
+  FilterModelName,
   FilterPersistenceClient,
   FilterScope,
   FilterSet,
@@ -11,13 +12,16 @@ import type {
   PersistedFilterViewRow,
 } from "./types.ts";
 
-export interface UseFilterViewsOptions<TSchema extends AnySchema> {
+export interface UseFilterViewsOptions<
+  TSchema extends AnySchema,
+  TFilterModel extends ModelName<TSchema> = FilterModelName & ModelName<TSchema>,
+> {
   /** ZenStack persistence client for the `FilterView` model. Reference must be stable. */
   viewClient: FilterViewPersistenceClient;
   /** ZenStack persistence client for the `Filter` model — same instance `useFilter` uses, so the caches align. */
   filterClient: FilterPersistenceClient;
   /** Owner scope (userId/organizationId). Same value passed to `useFilter`. */
-  scope?: FilterScope<TSchema>;
+  scope?: FilterScope<TSchema, TFilterModel>;
   /** The currently-open view id (e.g. from the route), or null for the working state. */
   activeViewId?: string | null;
   /** Gates DB access. When false queries are disabled and mutations no-op. Default: true. */
@@ -44,9 +48,13 @@ export interface UseFilterViewsReturn {
  * its `viewId`) — there is no copy into the working state. This hook only lists
  * views and snapshots/renames/deletes them.
  */
-export function useFilterViews<TSchema extends AnySchema, M extends ModelName<TSchema>>(
-  set: FilterSet<TSchema, M>,
-  opts: UseFilterViewsOptions<TSchema>,
+export function useFilterViews<
+  TSchema extends AnySchema,
+  M extends ModelName<TSchema>,
+  TFilterModel extends ModelName<TSchema> = FilterModelName & ModelName<TSchema>,
+>(
+  set: FilterSet<TSchema, M, TFilterModel>,
+  opts: UseFilterViewsOptions<TSchema, TFilterModel>,
 ): UseFilterViewsReturn {
   const { viewClient, filterClient, scope = {}, activeViewId = null, enabled = true } = opts;
   const filterSet = set.name;
