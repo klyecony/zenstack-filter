@@ -429,3 +429,8 @@ export interface FilterSet<
   readonly _filterModel?: TFilterModel;
   readonly __system: FilterSystemInternals;
 }
+
+// Consumer-facing config types. They live in `registry.ts` (next to the runtime
+// it types), but are surfaced here so the filter-set config can be typed without
+// reaching into the internal `registry` module.
+export type { FieldOverride, ModelFilterConfig, ModelFilterFields } from "./registry.ts";

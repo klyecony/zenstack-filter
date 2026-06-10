@@ -24,7 +24,7 @@ function resolveModelAt(
   return model;
 }
 
-export function wrapPath(
+function wrapPath(
   helpers: SchemaHelpers,
   condition: WhereInput,
   path: string[],

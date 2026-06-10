@@ -360,11 +360,9 @@ consumers never pull in `react`.
 | --- | --- |
 | `zenstack-filter` | `createFilterSystem`, `filterFactory` |
 | `zenstack-filter/build` | `buildWhere` — active filters → `where` input |
-| `zenstack-filter/types` | shared types (`FilterDef`, `ActiveFilter`, `FilterMeta`, …) |
+| `zenstack-filter/types` | shared types (`FilterDef`, `ActiveFilter`, `ModelFilterConfig`, `FieldOverride`, `FilterMeta`, …) |
 | `zenstack-filter/operators` | filter operators + helpers |
-| `zenstack-filter/schema` | schema helpers |
-| `zenstack-filter/generate` | `FilterDef` generation |
-| `zenstack-filter/registry` | building block |
+| `zenstack-filter/generate` | `generateFilterDefs` / `findFilterDef` — list/look up a set's filters |
 | `zenstack-filter/useFilter` | React: filter state + persistence |
 | `zenstack-filter/useFilterViews` | React: saved filter views |
 | `zenstack-filter/useFilterOptions` | React: async option loading |

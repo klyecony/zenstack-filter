@@ -44,17 +44,9 @@
       "types": "./dist/operators.d.ts",
       "import": "./dist/operators.js"
     },
-    "./registry": {
-      "types": "./dist/registry.d.ts",
-      "import": "./dist/registry.js"
-    },
     "./build": {
       "types": "./dist/build.d.ts",
       "import": "./dist/build.js"
-    },
-    "./schema": {
-      "types": "./dist/schema.d.ts",
-      "import": "./dist/schema.js"
     },
     "./generate": {
       "types": "./dist/generate.d.ts",
