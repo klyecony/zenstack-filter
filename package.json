@@ -1,0 +1,120 @@
+{
+  "name": "zenstack-filter",
+  "version": "0.1.0",
+  "description": "Headless, type-safe filter system for ZenStack 3 — schema-driven FilterDefs, where-builder, persisted filters per scope.",
+  "keywords": [
+    "zenstack",
+    "prisma",
+    "filter",
+    "where",
+    "typescript",
+    "react",
+    "headless"
+  ],
+  "author": "Cedrik Meis <cedrik.meis@proton.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/klyecony/zenstack-filter.git"
+  },
+  "homepage": "https://github.com/klyecony/zenstack-filter#readme",
+  "bugs": {
+    "url": "https://github.com/klyecony/zenstack-filter/issues"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/createFilterSystem.js",
+  "module": "./dist/createFilterSystem.js",
+  "types": "./dist/createFilterSystem.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/createFilterSystem.d.ts",
+      "import": "./dist/createFilterSystem.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    },
+    "./operators": {
+      "types": "./dist/operators.d.ts",
+      "import": "./dist/operators.js"
+    },
+    "./registry": {
+      "types": "./dist/registry.d.ts",
+      "import": "./dist/registry.js"
+    },
+    "./build": {
+      "types": "./dist/build.d.ts",
+      "import": "./dist/build.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js"
+    },
+    "./generate": {
+      "types": "./dist/generate.d.ts",
+      "import": "./dist/generate.js"
+    },
+    "./merge": {
+      "types": "./dist/merge.d.ts",
+      "import": "./dist/merge.js"
+    },
+    "./validate": {
+      "types": "./dist/validate.d.ts",
+      "import": "./dist/validate.js"
+    },
+    "./recentStore": {
+      "types": "./dist/recentStore.d.ts",
+      "import": "./dist/recentStore.js"
+    },
+    "./useFilter": {
+      "types": "./dist/useFilter.d.ts",
+      "import": "./dist/useFilter.js"
+    },
+    "./useFilterViews": {
+      "types": "./dist/useFilterViews.d.ts",
+      "import": "./dist/useFilterViews.js"
+    },
+    "./useFilterOptions": {
+      "types": "./dist/useFilterOptions.d.ts",
+      "import": "./dist/useFilterOptions.js"
+    },
+    "./dates": {
+      "types": "./dist/dates.d.ts",
+      "import": "./dist/dates.js"
+    },
+    "./infiniteSource": {
+      "types": "./dist/infiniteSource.d.ts",
+      "import": "./dist/infiniteSource.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check:types": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@zenstackhq/orm": "^3",
+    "@zenstackhq/schema": "^3",
+    "react": ">=18",
+    "zod": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^18 || ^19",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
