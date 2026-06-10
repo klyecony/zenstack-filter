@@ -78,7 +78,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "check:types": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepare": "tsup"
   },
   "peerDependencies": {
     "@zenstackhq/language": "^3",
