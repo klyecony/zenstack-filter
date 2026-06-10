@@ -338,12 +338,18 @@ helpers from `zenstack-filter/operators` (`operatorsFor`, `defaultOperatorFor`,
 | `number` | `equal` |
 | `select` | `equal` |
 | `multiselect` | `contains` |
-| `date` | `onDate` |
+| `date` | `equal` |
 | `dateRange` | `equal` |
 | `choice` | `equal` |
 
 Available operators: `equal`, `notEqual`, `greater`, `less`, `contains`,
-`notContains`, `onDate`.
+`notContains`.
+
+`date` and `dateRange` pass their values through to Prisma untouched — you
+decide the format (full ISO `…Z`, a date-only `YYYY-MM-DD`, a zoned offset, …).
+Note that a date-only `less`/`lte` bound compares against midnight and excludes
+the rest of that day; pass an end-of-day or exclusive next-day bound to include
+the whole day.
 
 ## Entry points
 
@@ -358,7 +364,7 @@ consumers never pull in `react`.
 | `zenstack-filter/operators` | filter operators + helpers |
 | `zenstack-filter/schema` | schema helpers |
 | `zenstack-filter/generate` | `FilterDef` generation |
-| `zenstack-filter/registry`, `/dates` | building blocks |
+| `zenstack-filter/registry` | building block |
 | `zenstack-filter/useFilter` | React: filter state + persistence |
 | `zenstack-filter/useFilterViews` | React: saved filter views |
 | `zenstack-filter/useFilterOptions` | React: async option loading |

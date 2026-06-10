@@ -1,4 +1,3 @@
-import { dateOnlyToIso } from "./dates.ts";
 import type { DateRange, FilterOperator, FilterOperatorDef, FilterType } from "./types.ts";
 
 type RawValue = unknown;
@@ -10,30 +9,10 @@ const OPERATOR_LABELS: Record<FilterOperator, string> = {
   less: "less than",
   contains: "contains",
   notContains: "does not contain",
-  onDate: "on",
 };
 
 export function operatorLabel(op: FilterOperator): string {
   return OPERATOR_LABELS[op];
-}
-
-function toDate(v: RawValue): Date {
-  if (v instanceof Date) return v;
-  if (typeof v === "string" || typeof v === "number") return new Date(v);
-  return new Date(Number.NaN);
-}
-
-function startOfDayIso(v: RawValue): string {
-  const d = toDate(v);
-  d.setHours(0, 0, 0, 0);
-  return d.toISOString();
-}
-
-function nextDayIso(v: RawValue): string {
-  const d = toDate(v);
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + 1);
-  return d.toISOString();
 }
 
 function asDateRange(v: RawValue): DateRange | null {
@@ -82,27 +61,25 @@ const number: FilterOperatorDef[] = [
   { value: "less", apply: (_input, v, f) => ({ [f]: { lt: Number(v) } }) },
 ];
 
+// Date values are passed through to Prisma untouched — the caller decides the
+// format (full ISO `…Z`, a date-only `YYYY-MM-DD`, a zoned offset, …). Note a
+// date-only `less`/`lte` bound compares against midnight and so excludes the
+// rest of that day; pass an end-of-day or exclusive next-day bound if you want
+// the whole day included.
 const date: FilterOperatorDef[] = [
-  {
-    value: "onDate",
-    apply: (_input, v, f) => ({
-      AND: [{ [f]: { gte: startOfDayIso(v) } }, { [f]: { lt: nextDayIso(v) } }],
-    }),
-  },
-  { value: "greater", apply: (_input, v, f) => ({ [f]: { gte: toDate(v).toISOString() } }) },
-  { value: "less", apply: (_input, v, f) => ({ [f]: { lte: toDate(v).toISOString() } }) },
+  { value: "equal", apply: (_input, v, f) => ({ [f]: { equals: v as RawValue } }) },
+  { value: "greater", apply: (_input, v, f) => ({ [f]: { gt: v as RawValue } }) },
+  { value: "less", apply: (_input, v, f) => ({ [f]: { lt: v as RawValue } }) },
 ];
 
+// Range bounds are passed through as-is — same formatting contract as `date`.
 const dateRange: FilterOperatorDef[] = [
   {
     value: "equal",
     apply: (_input, v, f) => {
       const r = asDateRange(v);
       if (!r) return {};
-      // Expand date-only strings to full ISO datetimes (start-of-day for gte,
-      // end-of-day for lte) so Prisma/ZenStack DateTime validation accepts the
-      // values and the `lte` bound includes the entire end day.
-      return { [f]: { gte: dateOnlyToIso(r.gte, "start"), lte: dateOnlyToIso(r.lte, "end") } };
+      return { [f]: { gte: r.gte, lte: r.lte } };
     },
   },
 ];
@@ -149,7 +126,7 @@ export const operatorsByType: Record<FilterType, FilterOperatorDef[]> = {
 export const defaultOperatorByType: Record<FilterType, FilterOperator> = {
   text: "contains",
   number: "equal",
-  date: "onDate",
+  date: "equal",
   dateRange: "equal",
   select: "equal",
   multiselect: "contains",

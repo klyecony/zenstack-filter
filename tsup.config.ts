@@ -12,7 +12,6 @@ export default defineConfig({
     useFilter: "src/useFilter.ts",
     useFilterViews: "src/useFilterViews.ts",
     useFilterOptions: "src/useFilterOptions.ts",
-    dates: "src/dates.ts",
     infiniteSource: "src/infiniteSource.ts",
     plugin: "src/plugin.ts",
   },

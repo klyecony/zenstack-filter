@@ -106,8 +106,7 @@ export type FilterOperator =
   | "greater"
   | "less"
   | "contains"
-  | "notContains"
-  | "onDate";
+  | "notContains";
 
 export interface DateRange {
   gte: string;

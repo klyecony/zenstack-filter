@@ -72,10 +72,6 @@
       "types": "./dist/useFilterOptions.d.ts",
       "import": "./dist/useFilterOptions.js"
     },
-    "./dates": {
-      "types": "./dist/dates.d.ts",
-      "import": "./dist/dates.js"
-    },
     "./infiniteSource": {
       "types": "./dist/infiniteSource.d.ts",
       "import": "./dist/infiniteSource.js"
