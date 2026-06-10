@@ -3,18 +3,18 @@ import type { DateRange, FilterOperator, FilterOperatorDef, FilterType } from ".
 
 type RawValue = unknown;
 
-const OPERATOR_LABELS_DE: Record<FilterOperator, string> = {
-  equal: "ist",
-  notEqual: "ist nicht",
-  greater: "größer als",
-  less: "kleiner als",
-  contains: "enthält",
-  notContains: "enthält nicht",
-  onDate: "am",
+const OPERATOR_LABELS: Record<FilterOperator, string> = {
+  equal: "is",
+  notEqual: "is not",
+  greater: "greater than",
+  less: "less than",
+  contains: "contains",
+  notContains: "does not contain",
+  onDate: "on",
 };
 
 export function operatorLabel(op: FilterOperator): string {
-  return OPERATOR_LABELS_DE[op];
+  return OPERATOR_LABELS[op];
 }
 
 function toDate(v: RawValue): Date {

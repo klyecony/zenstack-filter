@@ -11,17 +11,6 @@ React hooks.
 
 > Community package — not affiliated with or endorsed by the ZenStack team.
 
-```ts
-const { filterFactory } = createFilterSystem({ schema });
-
-const invoiceFilters = filterFactory.Invoice({
-  fields: { status: true, total: true, "customer.name": true },
-});
-
-const where = buildWhere(invoiceFilters, activeFilters);
-const invoices = await db.invoice.findMany({ where });
-```
-
 ## Why
 
 - **Schema-driven** — `FilterDef`s are derived from your ZenStack schema, so
@@ -232,6 +221,30 @@ search-first async source (`useSearch` / `useResolve`) — `zenstack-filter/infi
 provides `createInfiniteSearch` to wire infinite scroll onto an
 `useInfiniteQuery`-style hook.
 
+## Validation
+
+Validation is **caller-side and opt-in**. The hooks do **not** validate a value
+before persisting it — `applyFilter` writes whatever you hand it (it only skips
+filters flagged `disabled`). Validate in your editor UI before calling
+`applyFilter`, using the helpers from `zenstack-filter/validate`:
+
+```ts
+import { validateValue, isValueComplete } from "zenstack-filter/validate";
+
+const result = validateValue(def.type, value);
+if (result.ok) {
+  await control.applyFilter({ ...activeFilter, value: result.value });
+} else {
+  showError(result.error); // e.g. "invalid date", "gte must be <= lte"
+}
+```
+
+| Helper | Returns |
+| --- | --- |
+| `validateValue(type, value)` | `{ ok: true; value } \| { ok: false; error }` (coerces, e.g. numeric strings → number) |
+| `isValueComplete(type, value)` | `boolean` — quick "is this filled in enough to apply?" check |
+| `validateActiveFilter(filter, type)` | validates a whole `ActiveFilter`, returning the coerced filter |
+
 ## Required schema
 
 Persistence (the `useFilter` / `useFilterViews` hooks) reads and writes two
@@ -245,29 +258,48 @@ a fixed set of columns — `id`, `filterSet`, `identifier`, `operator`, `value`,
 > the headless core (`buildWhere`, `createFilterSystem`) without the persistence
 > hooks, you don't need these models at all.
 
+This is exactly what the plugin scaffolds — write it by hand only if you'd
+rather not run the plugin:
+
 ```zmodel
 model Filter {
-  id         String      @id @default(cuid())
+  id         String       @id @default(cuid())
 
   filterSet  String
   identifier String
   operator   String
   value      Json
   viewId     String?
-  view       FilterView? @relation(fields: [viewId], references: [id], onDelete: Cascade)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  view       FilterView?  @relation(fields: [viewId], references: [id], onDelete: Cascade)
 
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  // Add scope fields here (e.g. userId, organizationId) and fold them into the
+  // @@unique below so one owner's filters cannot collide with another's.
+  @@unique([filterSet, identifier, viewId])
+  @@index([viewId])
+
+  // TODO: restrict access for your app, e.g.
+  // @@allow('read,create,update,delete', auth() != null && userId == auth().userId)
+  @@allow('all', true)
 }
 
 model FilterView {
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
 
-  name      String
-  filterSet String
-  filters   Filter[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  name       String
+  filterSet  String
+  filters    Filter[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Add the same scope fields as on Filter and fold them into @@unique.
+  @@unique([filterSet, name])
+
+  // TODO: restrict access for your app.
+  @@allow('all', true)
 }
 ```
 
@@ -347,7 +379,7 @@ consumers never pull in `react`.
 | `zenstack-filter/operators` | filter operators + helpers |
 | `zenstack-filter/schema` | schema helpers |
 | `zenstack-filter/generate` | `FilterDef` generation |
-| `zenstack-filter/registry`, `/merge`, `/validate`, `/dates`, `/recentStore` | building blocks |
+| `zenstack-filter/registry`, `/validate`, `/dates` | building blocks |
 | `zenstack-filter/useFilter` | React: filter state + persistence |
 | `zenstack-filter/useFilterViews` | React: saved filter views |
 | `zenstack-filter/useFilterOptions` | React: async option loading |

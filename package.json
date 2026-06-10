@@ -60,17 +60,9 @@
       "types": "./dist/generate.d.ts",
       "import": "./dist/generate.js"
     },
-    "./merge": {
-      "types": "./dist/merge.d.ts",
-      "import": "./dist/merge.js"
-    },
     "./validate": {
       "types": "./dist/validate.d.ts",
       "import": "./dist/validate.js"
-    },
-    "./recentStore": {
-      "types": "./dist/recentStore.d.ts",
-      "import": "./dist/recentStore.js"
     },
     "./useFilter": {
       "types": "./dist/useFilter.d.ts",
