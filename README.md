@@ -351,6 +351,31 @@ Note that a date-only `less`/`lte` bound compares against midnight and excludes
 the rest of that day; pass an end-of-day or exclusive next-day bound to include
 the whole day.
 
+### Localizing operator labels (i18n)
+
+Each generated `FilterOperatorDef` carries a `value` (a stable key like
+`"equal"`) and a `label`. The defaults are English (`is`, `contains`, …). To
+translate them, pass `translateOperator` to `createFilterSystem` — it receives
+the operator key and returns the localized label:
+
+```ts
+import { createFilterSystem } from "zenstack-filter";
+import { schema } from "./zenstack/schema";
+import { t } from "./i18n"; // any i18n library
+
+const { filterFactory } = createFilterSystem({
+  schema,
+  translateOperator: op => t(`filter.op.${op}`), // op: "equal" | "contains" | …
+});
+```
+
+The function is called once per operator while a set's `FilterDef`s are
+generated, so labels reflect the locale active at generation time. A live
+locale switch re-translates only once the defs are regenerated — fine for
+apps where the language is fixed at load (or a reload on switch is acceptable).
+Field-level `operators` you supply with an explicit `label` keep that label;
+only operators without one are passed through `translateOperator`.
+
 ## Entry points
 
 The core is framework-agnostic; the React pieces are isolated so non-React

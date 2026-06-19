@@ -7,6 +7,7 @@ import type {
   FilterSet,
   FilterSystemInternals,
   ModelName,
+  OperatorTranslator,
 } from "./types.ts";
 
 export interface CreateFilterSystemConfig<
@@ -21,6 +22,14 @@ export interface CreateFilterSystemConfig<
    * `filterModel`).
    */
   filterModel?: TFilterModel;
+  /**
+   * Localizes operator labels. Called once per operator while generating
+   * `FilterDef`s — e.g. `op => t(`filter.op.${op}`)`. The label reflects the
+   * locale active at generation time; a live locale switch only re-translates
+   * once the defs are regenerated. Without it the built-in English labels
+   * (`is`, `contains`, …) are used.
+   */
+  translateOperator?: OperatorTranslator;
 }
 
 /**
@@ -56,13 +65,14 @@ export function createFilterSystem<
   TSchema extends AnySchema,
   TFilterModel extends ModelName<TSchema> = FilterModelName & ModelName<TSchema>,
 >(config: CreateFilterSystemConfig<TSchema, TFilterModel>): FilterSystem<TSchema, TFilterModel> {
-  const { schema } = config;
+  const { schema, translateOperator } = config;
 
   const helpers = createSchemaHelpers(schema);
   const registry = createRegistry();
   const { generateFilterDefsForSet, findFilterDefForSet } = createGenerator<TSchema>({
     helpers,
     registry,
+    translateOperator,
   });
 
   const internals: FilterSystemInternals = {

@@ -12,6 +12,7 @@ import type {
   FilterSet,
   FilterValue,
   ModelName,
+  OperatorTranslator,
   SchemaHelpers,
   VirtualFilterConfig,
 } from "./types.ts";
@@ -34,6 +35,8 @@ export function findFilterDef<TSchema extends AnySchema, M extends ModelName<TSc
 interface GenerateContext {
   helpers: SchemaHelpers;
   registry: FilterRegistry;
+  /** Localizes operator labels. Falls back to the built-in English labels. */
+  translateOperator?: OperatorTranslator;
 }
 
 interface ResolvedPath {
@@ -80,7 +83,11 @@ function resolveOptions(
   return undefined;
 }
 
-function virtualFilterToDef(identifier: string, raw: unknown): FilterDef {
+function virtualFilterToDef(
+  identifier: string,
+  raw: unknown,
+  labelFor: OperatorTranslator,
+): FilterDef {
   // biome-ignore lint/suspicious/noExplicitAny: storage erases generics; runtime shape matches VirtualFilterConfig
   const vf = raw as VirtualFilterConfig<any, any>;
   const operatorEntries: FilterOperatorDef[] = [];
@@ -93,7 +100,7 @@ function virtualFilterToDef(identifier: string, raw: unknown): FilterDef {
       if (!fn) continue;
       operatorEntries.push({
         value: op,
-        label: operatorLabel(op),
+        label: labelFor(op),
         apply: (_in, v) => fn(v),
       });
     }
@@ -104,13 +111,13 @@ function virtualFilterToDef(identifier: string, raw: unknown): FilterDef {
     const where = vf.where as (value: FilterValue) => Record<string, unknown>;
     operatorEntries.push({
       value: op,
-      label: operatorLabel(op),
+      label: labelFor(op),
       apply: (_in, v) => where(v),
     });
   }
 
   const operators =
-    operatorEntries.length > 0 ? operatorEntries : withLabels(operatorsFor(vf.type));
+    operatorEntries.length > 0 ? operatorEntries : withLabels(operatorsFor(vf.type), labelFor);
 
   const defaultOperator =
     vf.defaultOperator ?? operatorEntries[0]?.value ?? defaultOperatorFor(vf.type);
@@ -130,7 +137,8 @@ function virtualFilterToDef(identifier: string, raw: unknown): FilterDef {
 }
 
 export function createGenerator<TSchema extends AnySchema>(ctx: GenerateContext) {
-  const { helpers, registry } = ctx;
+  const { helpers, registry, translateOperator } = ctx;
+  const labelFor: OperatorTranslator = translateOperator ?? operatorLabel;
 
   function generateFilterDefsForSet(setName: string): FilterDef[] {
     const entry = registry.get(setName);
@@ -164,7 +172,7 @@ export function createGenerator<TSchema extends AnySchema>(ctx: GenerateContext)
         type,
         label: override?.label ?? humanize(resolved.fieldName),
         options: resolveOptions(helpers, resolved.field.type, override),
-        operators: withLabels(operators),
+        operators: withLabels(operators, labelFor),
         defaultOperator,
       };
       fromFields.push(def);
@@ -173,7 +181,7 @@ export function createGenerator<TSchema extends AnySchema>(ctx: GenerateContext)
     const virtual: FilterDef[] = [];
     const virtualCfg = config.virtual ?? {};
     for (const [identifier, vf] of Object.entries(virtualCfg)) {
-      virtual.push({ ...virtualFilterToDef(identifier, vf), table });
+      virtual.push({ ...virtualFilterToDef(identifier, vf, labelFor), table });
     }
 
     return [...fromFields, ...virtual];

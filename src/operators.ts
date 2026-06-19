@@ -1,4 +1,10 @@
-import type { DateRange, FilterOperator, FilterOperatorDef, FilterType } from "./types.ts";
+import type {
+  DateRange,
+  FilterOperator,
+  FilterOperatorDef,
+  FilterType,
+  OperatorTranslator,
+} from "./types.ts";
 
 type RawValue = unknown;
 
@@ -148,6 +154,9 @@ export function findOperator(
   return ops.find(o => o.value === op);
 }
 
-export function withLabels(ops: FilterOperatorDef[]): FilterOperatorDef[] {
-  return ops.map(o => ({ ...o, label: o.label ?? operatorLabel(o.value) }));
+export function withLabels(
+  ops: FilterOperatorDef[],
+  labelFor: OperatorTranslator = operatorLabel,
+): FilterOperatorDef[] {
+  return ops.map(o => ({ ...o, label: o.label ?? labelFor(o.value) }));
 }

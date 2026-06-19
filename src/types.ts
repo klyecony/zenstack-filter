@@ -108,6 +108,16 @@ export type FilterOperator =
   | "contains"
   | "notContains";
 
+/**
+ * Resolves the human-readable label for an operator. Pass one to
+ * `createFilterSystem({ translateOperator })` to localize operator labels — e.g.
+ * `op => t(`filter.op.${op}`)`. Called once per operator while generating
+ * `FilterDef`s, so the label reflects the locale active at generation time (no
+ * live re-translation on locale switch). Without it the built-in English labels
+ * are used.
+ */
+export type OperatorTranslator = (op: FilterOperator) => string;
+
 export interface DateRange {
   gte: string;
   lte: string;
